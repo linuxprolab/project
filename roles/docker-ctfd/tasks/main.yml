@@ -1,0 +1,49 @@
+---
+# tasks file for ctfd
+- name: Creates directory for ctfd role 
+  file:
+    path: /home/vagrant/CTFd
+    state: directory
+    
+- name: Clone a CTFd repo
+  ansible.builtin.git:
+    repo: https://github.com/CTFd/CTFd.git
+    dest: /home/vagrant/CTFd
+  ignore_errors: yes
+
+- name: Copy db configs
+  copy: src={{item.src}} dest={{item.dest}}
+  loop:
+    - {src: 'docker-compose.yml', dest: '/home/vagrant/CTFd/docker-compose.yml'}
+
+- name: reset ssh connection 
+  meta: reset_connection
+
+- name: Run container
+  shell:
+    chdir: /home/vagrant/CTFd
+    cmd: "docker-compose -f docker-compose.yml up -d"
+
+- name: Copy .data backup script 
+  ansible.builtin.copy:
+    src: ctfd_data_rsync.sh
+    dest: /home/vagrant/CTFd/ctfd_data_rsync.sh
+    owner: vagrant
+    group: vagrant
+    mode: '0770'
+
+- name: Creates directory for backups
+  file:
+    path: /home/vagrant/backup/CTFd
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0770'
+
+- name: add .data backup cron job 
+  ansible.builtin.cron:
+    name: "cron_.data_backup"
+    minute: "*"
+    hour: "*"
+    user: root 
+    job: "/home/vagrant/CTFd/ctfd_data_rsync.sh"

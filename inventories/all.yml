@@ -1,0 +1,45 @@
+all:
+  vars:
+    ansible_user: 'vagrant'
+bastion:
+  hosts:
+    bastion:
+      ansible_host: 127.0.0.1
+      ansible_port: 22001
+      ansible_ssh_private_key_file: .vagrant/machines/bastion/virtualbox/private_key 
+web:
+  hosts:
+    web-1:
+      ansible_host: 127.0.0.1 
+      ansible_port: 22002
+      ansible_ssh_private_key_file: .vagrant/machines/web-1/virtualbox/private_key 
+backend:
+  hosts:
+    backend-1:
+      ansible_host: 127.0.0.1 
+      ansible_port: 22003
+      ansible_ssh_private_key_file: .vagrant/machines/backend-1/virtualbox/private_key 
+db:
+  hosts:
+    db-1:
+      ansible_host: 127.0.0.1 
+      ansible_port: 22004
+      ansible_ssh_private_key_file: .vagrant/machines/backend-1/virtualbox/private_key 
+monitoring:
+  hosts:
+    monitorting-1:
+      ansible_host: 127.0.0.1 
+      ansible_port: 22005
+      ansible_ssh_private_key_file: .vagrant/machines/backend-1/virtualbox/private_key 
+log:
+  hosts:
+    log-1:
+      ansible_host: 127.0.0.1 
+      ansible_port: 22006
+      ansible_ssh_private_key_file: .vagrant/machines/backend-1/virtualbox/private_key 
+backup:
+  hosts:
+    backup-1:
+      ansible_host: 127.0.0.1 
+      ansible_port: 22007
+      ansible_ssh_private_key_file: .vagrant/machines/backend-1/virtualbox/private_key 

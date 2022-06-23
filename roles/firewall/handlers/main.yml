@@ -1,0 +1,6 @@
+---
+# handlers file for bastion
+- name: restart network
+  service: 
+    name: network
+    state: restarted

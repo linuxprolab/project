@@ -1,0 +1,74 @@
+---
+- name: 'Provision bastion hosts'
+  hosts: bastion 
+  gather_facts: true
+  become: true
+  roles:
+    - common
+    - node-exporter
+    - firewall 
+
+- name: 'Provision web hosts'
+  hosts: web
+  gather_facts: true
+  become: true
+  roles:
+    - common
+    - node-exporter
+    - cadvisor
+    - docker-host
+    - docker-nginx
+
+- name: 'Provision db hosts'
+  hosts: db 
+  gather_facts: true
+  become: true
+  roles:
+    - common
+    - node-exporter
+    - cadvisor
+    - docker-host
+    - docker-db 
+
+- name: 'Provision backend hosts'
+  hosts: backend
+  gather_facts: true
+  become: true
+  roles:
+    - common
+    - node-exporter
+    - cadvisor
+    - docker-host
+    - docker-cache
+    - docker-ctfd 
+
+- name: 'Provision log hosts'
+  hosts: log
+  gather_facts: true
+  become: true
+  roles:
+    - common
+    - node-exporter
+    - cadvisor
+    - docker-host
+    - docker-elk
+
+- name: 'Provision monitoring hosts'
+  hosts: monitoring
+  gather_facts: true
+  become: true
+  roles:
+    - common
+    - node-exporter
+    - cadvisor
+    - docker-host
+    - docker-prometheus 
+
+- name: 'Provision backup hosts'
+  hosts: backup 
+  gather_facts: true
+  become: true
+  roles:
+    - common
+    - node-exporter
+    - backup

@@ -1,0 +1,22 @@
+---
+# tasks file for elk
+- name: Creates directory for elk role 
+  file:
+    path: /home/vagrant/elk
+    state: directory
+
+- name: Copy elk configs
+  copy: src={{item.src}} dest={{item.dest}}
+  loop:
+    - {src: 'docker-compose.yml', dest: '/home/vagrant/elk/docker-compose.yml'}
+
+#- name: Copy project 
+#  copy: src=../CTFd dest=/home/vagrant
+
+- name: reset ssh connection 
+  meta: reset_connection
+
+- name: Run container
+  shell:
+    chdir: /home/vagrant/elk
+    cmd: "docker-compose -f docker-compose.yml up -d"

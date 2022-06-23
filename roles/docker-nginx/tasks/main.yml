@@ -1,0 +1,56 @@
+---
+# tasks file for nginx
+- name: Creates directory for nginx role 
+  file:
+    path: /home/vagrant/nginx
+    state: directory
+
+- name: Copy nginx configs
+  copy: src={{item.src}} dest={{item.dest}}
+  loop:
+    - {src: 'http.conf', dest: '/home/vagrant/nginx/http.conf'}
+    - {src: 'cert.crt', dest: '/home/vagrant/nginx/cert.crt'}
+    - {src: 'cert.key', dest: '/home/vagrant/nginx/cert.key'}
+    - {src: 'docker-compose.yml', dest: '/home/vagrant/nginx/docker-compose.yml'}
+
+#- name: Copy project 
+#  copy: src=../CTFd dest=/home/vagrant
+
+- name: reset ssh connection 
+  meta: reset_connection
+
+- name: Run container
+  shell:
+    chdir: /home/vagrant/nginx
+    cmd: "docker-compose -f docker-compose.yml up -d"
+
+- name: Install the filebeat rpm from a remote repo
+  yum:
+    name: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.2.2-x86_64.rpm
+    disable_gpg_check: True
+    state: present
+
+- name: enable nginx filebeat 
+  command: filebeat modules enable nginx
+  
+- name: Copy filebeat configs
+  copy: src={{item.src}} dest={{item.dest}}
+  loop:
+    - {src: 'filebeat.yml', dest: '/etc/filebeat/filebeat.yml'}
+    - {src: 'nginx.yml', dest: '/etc/filebeat/modules.d/nginx.yml'}
+
+- name: install kibana dashboards 
+  command: filebeat setup --dashboards 
+  ignore_errors: yes
+      
+- name: Enable the filebeat daemon in systemd
+  systemd:
+    name: filebeat 
+    enabled: yes
+    masked: no
+
+- name: Start the filebeat daemon
+  systemd:
+    name: filebeat
+    state: started
+    masked: no

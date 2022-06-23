@@ -1,0 +1,12 @@
+---
+# tasks file for prometheus
+- name: Copy prometheus 
+  copy: src=prometheus dest=/home/vagrant
+
+- name: reset ssh connection 
+  meta: reset_connection
+
+- name: Run container
+  shell:
+    chdir: /home/vagrant/prometheus
+    cmd: "docker-compose -f docker-compose.yml up -d"

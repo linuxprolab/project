@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  nginx:
+    image: nginx:stable
+    restart: always
+    volumes:
+      - ./http.conf:/etc/nginx/nginx.conf
+      - ./cert.crt:/etc/nginx/cert.crt
+      - ./cert.key:/etc/nginx/cert.key
+      - .data/nginx/logs:/var/log/nginx/
+    network_mode: host
+
+

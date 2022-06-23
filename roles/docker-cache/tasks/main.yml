@@ -1,0 +1,22 @@
+---
+# tasks file for cache
+- name: Creates directory for cache role 
+  file:
+    path: /home/vagrant/cache
+    state: directory
+
+- name: Copy db configs
+  copy: src={{item.src}} dest={{item.dest}}
+  loop:
+    - {src: 'docker-compose.yml', dest: '/home/vagrant/cache/docker-compose.yml'}
+
+#- name: Copy project 
+#  copy: src=../CTFd dest=/home/vagrant
+
+- name: reset ssh connection 
+  meta: reset_connection
+
+- name: Run container
+  shell:
+    chdir: /home/vagrant/cache
+    cmd: "docker-compose -f docker-compose.yml up -d"

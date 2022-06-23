@@ -1,0 +1,10 @@
+---
+# tasks file for backup
+- name: Copy sshd configs
+  copy: src={{item.src}} dest={{item.dest}}
+  loop:
+    - {src: 'sshd_config', dest: '/etc/ssh/sshd_config'}
+- name: Restart service sshd
+  ansible.builtin.service:
+    name: sshd
+    state: restarted

@@ -1,0 +1,46 @@
+---
+# tasks file for db
+- name: Creates directory for db role 
+  file:
+    path: /home/vagrant/db
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0770'
+
+- name: Copy db configs
+  copy: src={{item.src}} dest={{item.dest}}
+  loop:
+    - {src: 'docker-compose.yml', dest: '/home/vagrant/db/docker-compose.yml'}
+
+- name: reset ssh connection 
+  meta: reset_connection
+
+- name: Run container
+  shell:
+    chdir: /home/vagrant/db
+    cmd: "docker-compose -f docker-compose.yml up -d"
+
+- name: Copy db backup script 
+  ansible.builtin.copy:
+    src: db_dump_rsync.sh
+    dest: /home/vagrant/db/db_dump_rsync.sh
+    owner: vagrant
+    group: vagrant
+    mode: '0770'
+
+- name: Creates directory for backups
+  file:
+    path: /home/vagrant/backup/db
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0770'
+
+- name: add db backup cron job 
+  ansible.builtin.cron:
+    name: "cron_db_backup"
+    minute: "*"
+    hour: "*"
+    user: vagrant
+    job: "/home/vagrant/db/db_dump_rsync.sh"   

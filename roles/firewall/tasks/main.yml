@@ -1,0 +1,57 @@
+---
+# tasks file for bastion
+- name: install firewall packages
+  yum:
+    name:
+      - tcpdump
+      - firewalld
+#      - iptables
+#      - iptables-services
+    state: present
+    update_cache: true
+#- name: copy iptables config
+#  template:
+#    src: iptables
+#    dest: /etc/sysconfig/iptables
+#    owner: root
+#    group: root
+#    mode: 0600
+#- name: start and enable iptables service
+#  service:
+#    name: iptables
+#    state: restarted
+#    enabled: true
+- name: set up forward packages on router
+  sysctl:
+    name: net.ipv4.conf.all.forwarding
+    value: '1'
+    state: present
+    sysctl_file: /etc/sysctl.conf
+    ignoreerrors: yes
+    reload: yes
+  notify: restart network
+
+- name: start firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: add interface to zone 
+  shell: firewall-cmd --permanent --zone=public --change-interface=eth2 
+  
+- name: add service https on public zone 
+  shell: firewall-cmd --zone=public --permanent --add-service https
+
+- name: add interface to zone 
+  shell: firewall-cmd --zone=internal --change-interface=eth1 
+  
+- name: add service https on public zone 
+  shell: firewall-cmd --permanent --zone=internal --permanent --add-port=9100/tcp
+
+- name: add masquerading to public zone
+  shell: firewall-cmd --permanent --zone=public --add-masquerade
+  
+- name: add port forwarding
+  shell: firewall-cmd --permanent --zone=public --add-forward-port=port=443:proto=tcp:toport=443:toaddr=192.168.0.2
+
+- name: reload firewalld
+  shell: firewall-cmd --reload
+

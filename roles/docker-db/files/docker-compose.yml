@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  db:
+    image: mariadb:10.4.12
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=ctfd
+      - MYSQL_USER=ctfd
+      - MYSQL_PASSWORD=ctfd
+      - MYSQL_DATABASE=ctfd
+    volumes:
+      - .data/mysql:/var/lib/mysql
+    network_mode: host
+
+    # This command is required to set important mariadb defaults
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --wait_timeout=28800, --log-warnings=0]
+
+  mysqld_exporter:
+      image: prom/mysqld-exporter:latest
+      environment:
+        - DATA_SOURCE_NAME=ctfd:ctfd@(127.0.0.1:3306)/
+      network_mode: host
+      command: ["--web.listen-address=:9104", "--collect.global_status", "--collect.info_schema.innodb_metrics", "--collect.auto_increment.columns", "--collect.info_schema.processlist", "--collect.binlog_size", "--collect.info_schema.tablestats", "--collect.global_variables", "--collect.info_schema.query_response_time", "--collect.info_schema.userstats", "--collect.info_schema.tables", "--collect.perf_schema.tablelocks", "--collect.perf_schema.file_events", "--collect.perf_schema.eventswaits", "--collect.perf_schema.indexiowaits", "--collect.perf_schema.tableiowaits", "--collect.slave_status"]
+      depends_on:
+        - db
