@@ -15,13 +15,13 @@
   - [ ] TODO остальное
 - [x] организован backup базы -> bash скрипты
 ## Запуск и проверка
-- Клонируем репозиторий
+- Клонируем репозиторий:
 
 ```
 git clone https://github.com/linuxprolab/project
 cd project
 ```
-- В `Vagrantfile` необходимо внести изменения с в настройки `public` интерфейса машины `bastion`
+- В `Vagrantfile` необходимо внести изменения в настройки `public` интерфейса машины `bastion`:
 ```
 MACHINES = {
   :'bastion' => {
@@ -36,12 +36,11 @@ MACHINES = {
     ], 
   },
 ```
-- Поднимаем виртуалки
+- Поднимаем виртуалки:
 ```
 vagrant up
-
 ```
-- Запускаем плейбуки ansible
+- Запускаем плейбуки ansible:
 ```
 ansible-playbook playbooks/main.yml -i inventories/all.yml 
 ```
